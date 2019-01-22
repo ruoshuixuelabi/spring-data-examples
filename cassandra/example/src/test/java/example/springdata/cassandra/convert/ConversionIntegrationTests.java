@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 the original author or authors.
+ * Copyright 2016-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,25 +15,27 @@
  */
 package example.springdata.cassandra.convert;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import static org.assertj.core.api.Assertions.*;
+
+import example.springdata.cassandra.util.CassandraKeyspace;
 
 import java.util.Arrays;
+import java.util.Currency;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.cassandra.core.CassandraOperations;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.datastax.driver.core.Row;
+import com.datastax.driver.core.TupleValue;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
-
-import example.springdata.cassandra.util.RequiresCassandraKeyspace;
 
 /**
  * @author Mark Paluch
@@ -42,13 +44,13 @@ import example.springdata.cassandra.util.RequiresCassandraKeyspace;
 @SpringBootTest(classes = ConverterConfiguration.class)
 public class ConversionIntegrationTests {
 
-	@ClassRule public final static RequiresCassandraKeyspace CASSANDRA_KEYSPACE = RequiresCassandraKeyspace.onLocalhost();
+	@ClassRule public final static CassandraKeyspace CASSANDRA_KEYSPACE = CassandraKeyspace.onLocalhost();
 
 	@Autowired CassandraOperations operations;
 
 	@Before
-	public void setUp() throws Exception {
-		operations.truncate("addressbook");
+	public void setUp() {
+		operations.truncate(Addressbook.class);
 	}
 
 	/**
@@ -68,11 +70,11 @@ public class ConversionIntegrationTests {
 
 		Row row = operations.selectOne(QueryBuilder.select().from("addressbook"), Row.class);
 
-		assertThat(row, is(notNullValue()));
+		assertThat(row).isNotNull();
 
-		assertThat(row.getString("id"), is(equalTo("private")));
-		assertThat(row.getString("me"), containsString("\"firstname\":\"Walter\""));
-		assertThat(row.getList("friends", String.class), hasSize(2));
+		assertThat(row.getString("id")).isEqualTo("private");
+		assertThat(row.getString("me")).contains("\"firstname\":\"Walter\"");
+		assertThat(row.getList("friends", String.class)).hasSize(2);
 	}
 
 	/**
@@ -92,8 +94,8 @@ public class ConversionIntegrationTests {
 
 		Addressbook loaded = operations.selectOne(QueryBuilder.select().from("addressbook"), Addressbook.class);
 
-		assertThat(loaded.getMe(), is(equalTo(addressbook.getMe())));
-		assertThat(loaded.getFriends(), is(equalTo(addressbook.getFriends())));
+		assertThat(loaded.getMe()).isEqualTo(addressbook.getMe());
+		assertThat(loaded.getFriends()).isEqualTo(addressbook.getFriends());
 	}
 
 	/**
@@ -113,7 +115,44 @@ public class ConversionIntegrationTests {
 
 		CustomAddressbook loaded = operations.selectOne(QueryBuilder.select().from("addressbook"), CustomAddressbook.class);
 
-		assertThat(loaded.getTheId(), is(equalTo(addressbook.getId())));
-		assertThat(loaded.getMyDetailsAsJson(), containsString("\"firstname\":\"Walter\""));
+		assertThat(loaded.getTheId()).isEqualTo(addressbook.getId());
+		assertThat(loaded.getMyDetailsAsJson()).contains("\"firstname\":\"Walter\"");
+	}
+
+	/**
+	 * Creates and stores a new {@link Addressbook} inside of Cassandra writing map and tuple columns.
+	 */
+	@Test
+	public void shouldWriteConvertedMapsAndTuples() {
+
+		Addressbook addressbook = new Addressbook();
+		addressbook.setId("private");
+
+		Map<Integer, Currency> preferredCurrencies = new HashMap<>();
+		preferredCurrencies.put(1, Currency.getInstance("USD"));
+		preferredCurrencies.put(2, Currency.getInstance("EUR"));
+
+		Address address = new Address();
+		address.setAddress("3828 Piermont Dr");
+		address.setCity("Albuquerque");
+		address.setZip("87111");
+
+		addressbook.setPreferredCurrencies(preferredCurrencies);
+		addressbook.setAddress(address);
+
+		operations.insert(addressbook);
+
+		Row row = operations.selectOne(QueryBuilder.select().from("addressbook"), Row.class);
+
+		assertThat(row).isNotNull();
+
+		TupleValue tupleValue = row.getTupleValue("address");
+		assertThat(tupleValue.getString(0)).isEqualTo(address.getAddress());
+		assertThat(tupleValue.getString(1)).isEqualTo(address.getCity());
+		assertThat(tupleValue.getString(2)).isEqualTo(address.getZip());
+
+		Map<Integer, String> rawPreferredCurrencies = row.getMap("preferredCurrencies", Integer.class, String.class);
+
+		assertThat(rawPreferredCurrencies).containsEntry(1, "USD").containsEntry(2, "EUR");
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2016 the original author or authors.
+ * Copyright 2014-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,7 @@
  */
 package example.springdata.map;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
 
@@ -30,7 +29,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * Integration tests for {@link PersonRepository}.
- * 
+ *
  * @author Oliver Gierke
  */
 @RunWith(SpringRunner.class)
@@ -48,7 +47,7 @@ public class PersonRepositoryIntegrationTest {
 
 		Person person = repository.save(new Person("Dave", "Matthews", 47));
 
-		assertThat(repository.findOne(person.getId()), is(person));
+		assertThat(repository.findById(person.getId())).hasValue(person);
 	}
 
 	@Test
@@ -59,7 +58,7 @@ public class PersonRepositoryIntegrationTest {
 
 		List<Person> result = repository.findByAgeGreaterThan(18);
 
-		assertThat(result, hasItem(dave));
-		assertThat(result, not(hasItem(oliver)));
+		assertThat(result).contains(dave);
+		assertThat(result).doesNotContain(oliver);
 	}
 }

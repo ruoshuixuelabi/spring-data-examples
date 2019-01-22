@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,49 +15,18 @@
  */
 package example.springdata.cassandra.basic;
 
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.cassandra.config.SchemaAction;
-import org.springframework.data.cassandra.config.java.AbstractCassandraConfiguration;
-import org.springframework.data.cassandra.core.CassandraTemplate;
-import org.springframework.data.cassandra.repository.config.EnableCassandraRepositories;
-
-import com.datastax.driver.core.Session;
 
 /**
  * Basic {@link Configuration} to create the necessary schema for the {@link User} table.
- * 
+ *
  * @author Oliver Gierke
  * @author Thomas Darimont
  * @author Mark Paluch
  */
-@Configuration
-@EnableAutoConfiguration
+@SpringBootApplication
+@EntityScan(basePackageClasses = User.class)
 class BasicConfiguration {
-
-	@Configuration
-	@EnableCassandraRepositories
-	static class CassandraConfig extends AbstractCassandraConfiguration {
-
-		@Override
-		public String getKeyspaceName() {
-			return "example";
-		}
-
-		@Bean
-		public CassandraTemplate cassandraTemplate(Session session) {
-			return new CassandraTemplate(session);
-		}
-
-		@Override
-		public String[] getEntityBasePackages() {
-			return new String[] { User.class.getPackage().getName() };
-		}
-
-		@Override
-		public SchemaAction getSchemaAction() {
-			return SchemaAction.RECREATE;
-		}
-	}
 }

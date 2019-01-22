@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 the original author or authors.
+ * Copyright 2015-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,26 +18,32 @@ package example.springdata.neo4j;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import org.neo4j.ogm.annotation.EndNode;
-import org.neo4j.ogm.annotation.GraphId;
+import org.neo4j.ogm.annotation.GeneratedValue;
+import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
 
 /**
  * A Role relationship entity between an actor and movie.
- * 
+ *
  * @author Luanne Misquitta
+ * @author Michael J. Simons
  */
 @RelationshipEntity(type = "ACTED_IN")
 @NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
-@RequiredArgsConstructor
 @Getter
 public class Role {
 
-	private @GraphId Long id;
-	private final @StartNode Actor actor;
-	private final String role;
-	private final @EndNode Movie movie;
+	private @Id @GeneratedValue Long id;
+	private @StartNode Actor actor;
+	private String role;
+	private @EndNode Movie movie;
+
+	Role(Actor actor, String role, Movie movie) {
+		this.actor = actor;
+		this.role = role;
+		this.movie = movie;
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 the original author or authors.
+ * Copyright 2016-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,6 @@
 package example.springdata.cassandra.people;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.data.cassandra.config.SchemaAction;
-import org.springframework.data.cassandra.config.java.AbstractReactiveCassandraConfiguration;
-import org.springframework.data.cassandra.repository.config.EnableReactiveCassandraRepositories;
 
 /**
  * Simple configuration for reactive Cassandra support.
@@ -26,16 +23,5 @@ import org.springframework.data.cassandra.repository.config.EnableReactiveCassan
  * @author Mark Paluch
  */
 @SpringBootApplication
-@EnableReactiveCassandraRepositories
-class ApplicationConfiguration extends AbstractReactiveCassandraConfiguration {
-
-	@Override
-	protected String getKeyspaceName() {
-		return "example";
-	}
-
-	@Override
-	public SchemaAction getSchemaAction() {
-		return SchemaAction.RECREATE;
-	}
+class ApplicationConfiguration {
 }

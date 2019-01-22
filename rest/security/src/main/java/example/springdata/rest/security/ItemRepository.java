@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,9 +38,9 @@ public interface ItemRepository extends CrudRepository<Item, Long> {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.data.repository.CrudRepository#delete(java.io.Serializable)
+	 * @see org.springframework.data.repository.CrudRepository#deleteById(java.lang.Object)
 	 */
 	@Override
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	void delete(Long aLong);
+	void deleteById(Long aLong);
 }

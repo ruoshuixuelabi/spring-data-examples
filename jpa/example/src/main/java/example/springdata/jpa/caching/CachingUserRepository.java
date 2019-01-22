@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,15 @@ import org.springframework.data.repository.CrudRepository;
 
 /**
  * User repository using Spring's caching abstraction.
- * 
+ *
  * @author Oliver Gierke
  * @author Thomas Darimont
+ * @author Andrea Rizzini
  */
 public interface CachingUserRepository extends CrudRepository<User, Long> {
 
 	@Override
-	@CacheEvict("byUsername")
+	@CacheEvict(value = "byUsername", key = "#p0.username")
 	<S extends User> S save(S entity);
 
 	@Cacheable("byUsername")

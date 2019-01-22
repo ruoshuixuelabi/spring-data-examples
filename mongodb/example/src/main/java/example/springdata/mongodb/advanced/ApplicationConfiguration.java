@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2016 the original author or authors.
+ * Copyright 2014-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +18,16 @@ package example.springdata.mongodb.advanced;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.mongodb.core.MongoOperations;
 
-import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
 
 /**
  * Test configuration to connect to a MongoDB named "test" and using a {@link MongoClient} with profiling enabled.
- * 
+ *
  * @author Christoph Strobl
  */
 @SpringBootApplication
@@ -62,6 +62,6 @@ class ApplicationConfiguration {
 	}
 
 	private void setProfilingLevel(int level) {
-		operations.executeCommand(new BasicDBObject("profile", level));
+		operations.executeCommand(new Document("profile", level));
 	}
 }

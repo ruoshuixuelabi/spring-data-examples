@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2016 the original author or authors.
+ * Copyright 2014-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * Test case to show Spring Data Elasticsearch functionality.
- * 
+ *
  * @author Artur Konczak
  * @author Oliver Gierke
  * @author Christoph Strobl
@@ -53,7 +53,7 @@ public class ElasticsearchOperationsTest {
 		String expectedDate = "2014-10-29";
 		String expectedWord = "java";
 		CriteriaQuery query = new CriteriaQuery(
-				new Criteria("_all").contains(expectedWord).and(new Criteria("date").greaterThanEqual(expectedDate)));
+				new Criteria("keywords").contains(expectedWord).and(new Criteria("date").greaterThanEqual(expectedDate)));
 
 		List<Conference> result = operations.queryForList(query, Conference.class);
 

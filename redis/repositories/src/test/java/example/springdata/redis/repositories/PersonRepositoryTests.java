@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 the original author or authors.
+ * Copyright 2016-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,13 @@
  */
 package example.springdata.redis.repositories;
 
-import static org.hamcrest.collection.IsIterableContainingInAnyOrder.*;
-import static org.hamcrest.core.Is.*;
-import static org.hamcrest.core.IsCollectionContaining.*;
-import static org.hamcrest.core.IsNot.*;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.*;
 
 import example.springdata.redis.test.util.EmbeddedRedisServer;
 import example.springdata.redis.test.util.RequiresRedisServer;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
@@ -36,21 +33,28 @@ import org.junit.rules.RuleChain;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.geo.Circle;
+import org.springframework.data.geo.Distance;
+import org.springframework.data.geo.Metrics;
+import org.springframework.data.geo.Point;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.index.GeoIndexed;
 import org.springframework.data.redis.core.index.Indexed;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * @author Christoph Strobl
  * @author Oliver Gierke
+ * @author Mark Paluch
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = ApplicationConfiguration.class)
-public class PersonRepositoryTests<K, V> {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class PersonRepositoryTests {
 
 	/**
 	 * We need to have a Redis server instance available. <br />
@@ -58,12 +62,13 @@ public class PersonRepositoryTests<K, V> {
 	 * 2) Ignore tests if startup failed and no server running locally.
 	 */
 	public static @ClassRule RuleChain rules = RuleChain
-			.outerRule(EmbeddedRedisServer.runningAt(6379).suppressExceptions()).around(RequiresRedisServer.onLocalhost());
+			.outerRule(EmbeddedRedisServer.runningAt(6379).suppressExceptions())
+			.around(RequiresRedisServer.onLocalhost().atLeast("3.2"));
 
 	/** {@link Charset} for String conversion **/
-	private static final Charset CHARSET = Charset.forName("UTF-8");
+	private static final Charset CHARSET = StandardCharsets.UTF_8;
 
-	@Autowired RedisOperations<K, V> operations;
+	@Autowired RedisOperations<Object, Object> operations;
 	@Autowired PersonRepository repository;
 
 	/*
@@ -96,9 +101,9 @@ public class PersonRepositoryTests<K, V> {
 
 		repository.save(eddard);
 
-		assertThat(operations.execute(
-				(RedisConnection connection) -> connection.exists(new String("persons:" + eddard.getId()).getBytes(CHARSET))),
-				is(true));
+		assertThat(operations
+				.execute((RedisConnection connection) -> connection.exists(("persons:" + eddard.getId()).getBytes(CHARSET))))
+						.isTrue();
 	}
 
 	/**
@@ -111,8 +116,7 @@ public class PersonRepositoryTests<K, V> {
 
 		List<Person> starks = repository.findByLastname(eddard.getLastname());
 
-		assertThat(starks, containsInAnyOrder(eddard, robb, sansa, arya, bran, rickon));
-		assertThat(starks, not(hasItem(jon)));
+		assertThat(starks).contains(eddard, robb, sansa, arya, bran, rickon).doesNotContain(jon);
 	}
 
 	/**
@@ -125,8 +129,7 @@ public class PersonRepositoryTests<K, V> {
 
 		List<Person> aryaStark = repository.findByFirstnameAndLastname(arya.getFirstname(), arya.getLastname());
 
-		assertThat(aryaStark, hasItem(arya));
-		assertThat(aryaStark, not(hasItems(eddard, robb, sansa, bran, rickon, jon)));
+		assertThat(aryaStark).containsOnly(arya);
 	}
 
 	/**
@@ -139,27 +142,41 @@ public class PersonRepositoryTests<K, V> {
 
 		List<Person> aryaAndJon = repository.findByFirstnameOrLastname(arya.getFirstname(), jon.getLastname());
 
-		assertThat(aryaAndJon, containsInAnyOrder(arya, jon));
-		assertThat(aryaAndJon, not(hasItems(eddard, robb, sansa, bran, rickon)));
+		assertThat(aryaAndJon).containsOnly(arya, jon);
+	}
+
+	/**
+	 * Find entities by {@link Example Query by Example}.
+	 */
+	@Test
+	public void findByQueryByExample() {
+
+		flushTestUsers();
+
+		Example<Person> example = Example.of(new Person(null, "stark", null));
+
+		Iterable<Person> starks = repository.findAll(example);
+
+		assertThat(starks).contains(arya, eddard).doesNotContain(jon);
 	}
 
 	/**
 	 * Find entities in range defined by {@link Pageable}.
 	 */
 	@Test
-	public void findByReturingPage() {
+	public void findByReturningPage() {
 
 		flushTestUsers();
 
-		Page<Person> page1 = repository.findPersonByLastname(eddard.getLastname(), new PageRequest(0, 5));
+		Page<Person> page1 = repository.findPersonByLastname(eddard.getLastname(), PageRequest.of(0, 5));
 
-		assertThat(page1.getNumberOfElements(), is(5));
-		assertThat(page1.getTotalElements(), is(6L));
+		assertThat(page1.getNumberOfElements()).isEqualTo(5);
+		assertThat(page1.getTotalElements()).isEqualTo(6);
 
-		Page<Person> page2 = repository.findPersonByLastname(eddard.getLastname(), new PageRequest(1, 5));
+		Page<Person> page2 = repository.findPersonByLastname(eddard.getLastname(), PageRequest.of(1, 5));
 
-		assertThat(page2.getNumberOfElements(), is(1));
-		assertThat(page2.getTotalElements(), is(6L));
+		assertThat(page2.getNumberOfElements()).isEqualTo(1);
+		assertThat(page2.getTotalElements()).isEqualTo(6);
 	}
 
 	/**
@@ -178,12 +195,44 @@ public class PersonRepositoryTests<K, V> {
 
 		List<Person> eddardStark = repository.findByAddress_City(winterfell.getCity());
 
-		assertThat(eddardStark, hasItem(eddard));
-		assertThat(eddardStark, not(hasItems(robb, sansa, arya, bran, rickon, jon)));
+		assertThat(eddardStark).containsOnly(eddard);
 	}
 
 	/**
-	 * Store references to other entites without embedding all data. <br />
+	 * Find entity by a {@link GeoIndexed} property on an embedded entity.
+	 */
+	@Test
+	public void findByGeoLocationProperty() {
+
+		Address winterfell = new Address();
+		winterfell.setCountry("the north");
+		winterfell.setCity("winterfell");
+		winterfell.setLocation(new Point(52.9541053, -1.2401016));
+
+		eddard.setAddress(winterfell);
+
+		Address casterlystein = new Address();
+		casterlystein.setCountry("Westerland");
+		casterlystein.setCity("Casterlystein");
+		casterlystein.setLocation(new Point(51.5287352, -0.3817819));
+
+		robb.setAddress(casterlystein);
+
+		flushTestUsers();
+
+		Circle innerCircle = new Circle(new Point(51.8911912, -0.4979756), new Distance(50, Metrics.KILOMETERS));
+		List<Person> eddardStark = repository.findByAddress_LocationWithin(innerCircle);
+
+		assertThat(eddardStark).containsOnly(robb);
+
+		Circle biggerCircle = new Circle(new Point(51.8911912, -0.4979756), new Distance(200, Metrics.KILOMETERS));
+		List<Person> eddardAndRobbStark = repository.findByAddress_LocationWithin(biggerCircle);
+
+		assertThat(eddardAndRobbStark).hasSize(2).contains(robb, eddard);
+	}
+
+	/**
+	 * Store references to other entities without embedding all data. <br />
 	 * Print out the hash structure within Redis.
 	 */
 	@Test
@@ -195,23 +244,25 @@ public class PersonRepositoryTests<K, V> {
 
 		repository.save(eddard);
 
-		Person laoded = repository.findOne(eddard.getId());
-		assertThat(laoded.getChildren(), hasItems(jon, robb, sansa, arya, bran, rickon));
+		assertThat(repository.findById(eddard.getId())).hasValueSatisfying(it -> {
+			assertThat(it.getChildren()).contains(jon, robb, sansa, arya, bran, rickon);
+		});
 
 		/*
 		 * Deceased:
-		 *  
+		 *
 		 * - Robb was killed by Roose Bolton during the Red Wedding.
-		 * - Jon was stabbed by brothers or the Night's Watch. 
+		 * - Jon was stabbed by brothers or the Night's Watch.
 		 */
-		repository.delete(Arrays.asList(robb, jon));
+		repository.deleteAll(Arrays.asList(robb, jon));
 
-		laoded = repository.findOne(eddard.getId());
-		assertThat(laoded.getChildren(), hasItems(sansa, arya, bran, rickon));
-		assertThat(laoded.getChildren(), not(hasItems(robb, jon)));
+		assertThat(repository.findById(eddard.getId())).hasValueSatisfying(it -> {
+			assertThat(it.getChildren()).contains(sansa, arya, bran, rickon);
+			assertThat(it.getChildren()).doesNotContain(robb, jon);
+		});
 	}
 
 	private void flushTestUsers() {
-		repository.save(Arrays.asList(eddard, robb, sansa, arya, bran, rickon, jon));
+		repository.saveAll(Arrays.asList(eddard, robb, sansa, arya, bran, rickon, jon));
 	}
 }

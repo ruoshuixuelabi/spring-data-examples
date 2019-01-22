@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 the original author or authors.
+ * Copyright 2015-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ import example.users.User;
 import example.users.UserRepository;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.data.web.PageableDefault;
@@ -35,12 +34,12 @@ import com.querydsl.core.types.Predicate;
 
 /**
  * Controller to handle web requests for {@link User}s.
- * 
+ *
  * @author Christoph Strobl
  * @author Oliver Gierke
  */
 @Controller
-@RequiredArgsConstructor(onConstructor = @__(@Autowired) )
+@RequiredArgsConstructor
 class UserController {
 
 	private final UserRepository repository;

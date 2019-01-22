@@ -8,36 +8,46 @@
 	<parent>
 		<groupId>org.springframework.data.examples</groupId>
 		<artifactId>spring-data-examples</artifactId>
-		<version>1.0.0.BUILD-SNAPSHOT</version>
+		<version>2.0.0.BUILD-SNAPSHOT</version>
 	</parent>
 
 	<name>Spring Data MongoDB - Examples</name>
 	<description>Sample projects for Spring Data MongoDB</description>
 	<url>http://projects.spring.io/spring-data-mongodb</url>
-	<inceptionYear>2011-2015</inceptionYear>
+	<inceptionYear>2011</inceptionYear>
 
 	<modules>
 	    <module>aggregation</module>
+		<module>change-streams</module>
 		<module>example</module>
-		<module>text-search</module>
-		<module>java8</module>
-		<module>security</module>
+		<module>fluent-api</module>
 		<module>geo-json</module>
+		<module>gridfs</module>
+		<module>java8</module>
+		<module>kotlin</module>
 		<module>query-by-example</module>
 		<module>reactive</module>
+		<module>security</module>
+		<module>text-search</module>
+		<module>transactions</module>
+		<module>schema-validation</module>
+		<module>util</module>
 	</modules>
+
+	<properties>
+		<embedded-mongo.version>2.1.1</embedded-mongo.version>
+	</properties>
 
 	<dependencies>
 
 		<dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-mongodb</artifactId>
-        </dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-mongodb</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>com.querydsl</groupId>
 			<artifactId>querydsl-mongodb</artifactId>
-			<version>${querydsl.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.mongodb</groupId>
@@ -54,7 +64,7 @@
 		<dependency>
 			<groupId>de.flapdoodle.embed</groupId>
 			<artifactId>de.flapdoodle.embed.mongo</artifactId>
-			<scope>runtime</scope>
+			<scope>provided</scope>
 		</dependency>
 
 	</dependencies>

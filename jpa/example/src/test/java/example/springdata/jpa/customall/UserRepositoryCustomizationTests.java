@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 the original author or authors.
+ * Copyright 2015-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,31 +15,30 @@
  */
 package example.springdata.jpa.customall;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.*;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Intergration test showing the usage of a custom method implemented for all repositories
- * 
+ *
  * @author Oliver Gierke
  * @soundtrack Elen - It's you (Elen)
  */
 @RunWith(SpringRunner.class)
 @Transactional
-@SpringBootApplication
+@SpringBootTest
 public class UserRepositoryCustomizationTests {
 
 	@Autowired UserRepository repository;
 
 	@Test
 	public void invokesCustomMethod() {
-		assertThat(repository.customMethod(), is(0L));
+		assertThat(repository.customMethod()).isEqualTo(0L);
 	}
 }

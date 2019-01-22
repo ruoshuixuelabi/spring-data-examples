@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2016 the original author or authors.
+ * Copyright 2014-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package example.springdata.rest.stores;
 import static org.springframework.data.mongodb.core.index.GeoSpatialIndexType.*;
 
 import lombok.Value;
+import lombok.experimental.Wither;
 
 import java.util.UUID;
 
@@ -28,20 +29,22 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * Entity to represent a {@link Store}.
- * 
+ *
  * @author Oliver Gierke
+ * @author Mark Paluch
  */
 @Value
+@Wither
 @Document
 public class Store {
 
-	@Id UUID id = UUID.randomUUID();
+	@Id UUID id;
 	String name;
 	Address address;
 
 	/**
 	 * Value object to represent an {@link Address}.
-	 * 
+	 *
 	 * @author Oliver Gierke
 	 */
 	@Value

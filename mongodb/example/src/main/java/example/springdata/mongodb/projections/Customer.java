@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 the original author or authors.
+ * Copyright 2015-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package example.springdata.mongodb.projections;
 
-import lombok.Value;
+import lombok.Data;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -23,11 +23,17 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * @author Oliver Gierke
+ * @author Mark Paluch
  */
-@Value
+@Data
 @Document
 class Customer {
 
 	@Id ObjectId id = new ObjectId();
 	String firstname, lastname;
+
+	public Customer(String firstname, String lastname) {
+		this.firstname = firstname;
+		this.lastname = lastname;
+	}
 }

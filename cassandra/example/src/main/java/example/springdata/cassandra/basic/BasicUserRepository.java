@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,14 +23,14 @@ import org.springframework.data.repository.CrudRepository;
 /**
  * Simple repository interface for {@link User} instances. The interface is used to declare so called query methods,
  * methods to retrieve single entities or collections of them.
- * 
+ *
  * @author Thomas Darimont
  */
 public interface BasicUserRepository extends CrudRepository<User, Long> {
 
 	/**
 	 * Sample method annotated with {@link Query}. This method executes the CQL from the {@link Query} value.
-	 * 
+	 *
 	 * @param id
 	 * @return
 	 */
@@ -48,8 +48,8 @@ public interface BasicUserRepository extends CrudRepository<User, Long> {
 
 	/**
 	 * Derived query method using SASI (SSTable Attached Secondary Index) features through the {@code LIKE} keyword. This
-	 * query corresponds with {@code SELECT * FROM users WHERE uname LIKE '?0%'}. {@link User#username} is not part of the
-	 * primary so it requires a secondary index.
+	 * query corresponds with {@code SELECT * FROM users WHERE lname LIKE '?0'}. {@link User#lastname} is not part of the
+	 * primary key so it requires a secondary index.
 	 *
 	 * @param lastnamePrefix
 	 * @return

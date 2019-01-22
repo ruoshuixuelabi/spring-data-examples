@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 the original author or authors.
+ * Copyright 2015-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,12 @@ package example.springdata.neo4j;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import org.neo4j.ogm.annotation.GraphId;
+import org.neo4j.ogm.annotation.GeneratedValue;
+import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -33,16 +33,20 @@ import org.neo4j.ogm.annotation.Relationship;
  *
  * @author Luanne Misquitta
  * @author Oliver Gierke
+ * @author Michael J. Simons
  */
 @NodeEntity(label = "Actor")
 @NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
-@RequiredArgsConstructor
 @Getter
 public class Actor {
 
-	private @GraphId Long id;
-	private final String name;
-	private final @Relationship(type = "ACTED_IN") Set<Role> roles = new HashSet<>();
+	private @Id @GeneratedValue Long id;
+	private String name;
+	private @Relationship(type = "ACTED_IN") Set<Role> roles = new HashSet<>();
+
+	public Actor(String name) {
+		this.name = name;
+	}
 
 	public void actedIn(Movie movie, String roleName) {
 

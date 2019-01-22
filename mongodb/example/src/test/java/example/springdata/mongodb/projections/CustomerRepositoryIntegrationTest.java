@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 the original author or authors.
+ * Copyright 2015-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Integration tests for {@link CustomerRepository} to show projection capabilities.
- * 
+ *
  * @author Oliver Gierke
  */
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -113,7 +113,7 @@ public class CustomerRepositoryIntegrationTest {
 	public void supportsProjectionInCombinationWithPagination() {
 
 		Page<CustomerProjection> page = customers
-				.findPagedProjectedBy(new PageRequest(0, 1, new Sort(Direction.ASC, "lastname")));
+				.findPagedProjectedBy(PageRequest.of(0, 1, Sort.by(Direction.ASC, "lastname")));
 
 		assertThat(page.getContent().get(0).getFirstname(), is("Carter"));
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2018 the original author or authors.
  *
  * Licenseimport static org.junit.Assert.*;
 
@@ -19,7 +19,9 @@ ess or implied.
  */
 package example.springdata.jpa.basics;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.*;
+
+import example.springdata.jpa.simple.User;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -31,18 +33,16 @@ import org.junit.Test;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.data.repository.CrudRepository;
 
-import example.springdata.jpa.simple.User;
-
 /**
  * This unit tests shows plain usage of {@link SimpleJpaRepository}.
- * 
+ *
  * @author Oliver Gierke
  * @author Thomas Darimont
  */
 public class BasicSample {
 
-	private CrudRepository<User, Long> userRepository;
-	private EntityManager em;
+	CrudRepository<User, Long> userRepository;
+	EntityManager em;
 
 	/**
 	 * Sets up a {@link SimpleJpaRepository} instance.
@@ -65,7 +65,7 @@ public class BasicSample {
 
 	/**
 	 * Tests saving users. Don't mimic transactionality shown here. It seriously lacks resource cleanup in case of an
-	 * exception. Simplification serves descriptivness.
+	 * exception. Simplification serves descriptiveness.
 	 */
 	@Test
 	public void savingUsers() {
@@ -75,6 +75,6 @@ public class BasicSample {
 
 		user = userRepository.save(user);
 
-		assertEquals(user, userRepository.findOne(user.getId()));
+		assertThat(userRepository.findById(user.getId())).hasValue(user);
 	}
 }

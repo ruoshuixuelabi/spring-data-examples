@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2016 the original author or authors.
+ * Copyright 2014-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.UUID;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.file.FlatFileItemReader;
@@ -35,8 +36,9 @@ import org.springframework.stereotype.Component;
 
 /**
  * Component initializing a hand full of Starbucks stores and persisting them through a {@link StoreRepository}.
- * 
+ *
  * @author Oliver Gierke
+ * @author Mark Paluch
  */
 @Slf4j
 @Component
@@ -51,14 +53,14 @@ public class StoreInitializer {
 
 		List<Store> stores = readStores();
 		log.info("Importing {} stores into MongoDB…", stores.size());
-		repository.save(stores);
+		repository.saveAll(stores);
 		log.info("Successfully imported {} stores.", repository.count());
 	}
 
 	/**
 	 * Reads a file {@code starbucks.csv} from the class path and parses it into {@link Store} instances about to
 	 * persisted.
-	 * 
+	 *
 	 * @return
 	 * @throws Exception
 	 */
@@ -84,7 +86,7 @@ public class StoreInitializer {
 			Address address = new Address(fields.readString("Street Address"), fields.readString("City"),
 					fields.readString("Zip"), location);
 
-			return new Store(fields.readString("Name"), address);
+			return new Store(UUID.randomUUID(), fields.readString("Name"), address);
 		});
 
 		lineMapper.setLineTokenizer(tokenizer);

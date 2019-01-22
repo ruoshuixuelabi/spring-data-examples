@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,32 +15,34 @@
  */
 package example.springdata.jpa.auditing;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.AuditorAware;
 
 /**
  * Dummy implementation of {@link AuditorAware}. It will return the configured {@link AuditableUser} as auditor on every
  * call to {@link #getCurrentAuditor()}. Normally you would access the applications security subsystem to return the
  * current user.
- * 
+ *
  * @author Oliver Gierke
  * @author Thomas Darimont
  */
 public class AuditorAwareImpl implements AuditorAware<AuditableUser> {
 
-	private AuditableUser auditor;
+	private Optional<AuditableUser> auditor = Optional.empty();
 
 	/**
 	 * @param auditor the auditor to set
 	 */
 	public void setAuditor(AuditableUser auditor) {
-		this.auditor = auditor;
+		this.auditor = Optional.of(auditor);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.springframework.data.domain.AuditorAware#getCurrentAuditor()
 	 */
-	public AuditableUser getCurrentAuditor() {
+	public Optional<AuditableUser> getCurrentAuditor() {
 		return auditor;
 	}
 }

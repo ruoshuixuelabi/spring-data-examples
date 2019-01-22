@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 the original author or authors.
+ * Copyright 2015-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,60 +15,40 @@
  */
 package example.springdata.neo4j;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.Assume.*;
+
+import java.util.Optional;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.neo4j.ogm.drivers.embedded.driver.EmbeddedDriver;
-import org.neo4j.ogm.session.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringBootVersion;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
-import org.springframework.data.neo4j.transaction.Neo4jTransactionManager;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.data.util.Version;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ClassUtils;
 
 /**
  * Simple integration test demonstrating the use of the ActorRepository
- * 
+ *
  * @author Luanne Misquitta
  * @author Oliver Gierke
+ * @author Michael J. Simons
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(SpringRunner.class)
 @SpringBootTest
 @Transactional
 public class ActorRepositoryIntegrationTest {
 
-	@Configuration
-	@EnableTransactionManagement
-	@EnableNeo4jRepositories
-	static class ExampleConfig {
-
-		@Bean
-		SessionFactory getSessionFactory() {
-
-			org.neo4j.ogm.config.Configuration configuration = new org.neo4j.ogm.config.Configuration();
-			configuration.driverConfiguration().setDriverClassName(EmbeddedDriver.class.getName());
-
-			return new SessionFactory(configuration, "example.springdata.neo4j");
-		}
-
-		@Bean
-		Neo4jTransactionManager transactionManager(SessionFactory factory) {
-			return new Neo4jTransactionManager(factory);
-		}
-	}
+	@SpringBootApplication
+	static class ExampleConfig {}
 
 	@Autowired ActorRepository actorRepository;
 
-	/**
-	 * @see #131
-	 */
-	@Test
+	@Test // #131
 	public void shouldBeAbleToSaveAndLoadActor() {
 
 		Movie goblet = new Movie("Harry Potter and the Goblet of Fire");
@@ -78,14 +58,54 @@ public class ActorRepositoryIntegrationTest {
 
 		actorRepository.save(daniel); // saves the actor and the movie
 
-		Actor actor = actorRepository.findOne(daniel.getId());
+		assertThat(actorRepository.findById(daniel.getId())).hasValueSatisfying(actor -> {
+			assertThat(actor.getName()).isEqualTo(daniel.getName());
+			assertThat(actor.getRoles()).hasSize(1).first()
+					.satisfies(role -> assertThat(role.getRole()).isEqualTo("Harry Potter"));
+		});
+	}
 
-		assertThat(actor, is(notNullValue()));
-		assertThat(actor.getName(), is(daniel.getName()));
-		assertThat(actor.getRoles(), hasSize(1));
+	@Test // #386
+	public void shouldBeAbleToHandleNestedProperties() {
 
-		Role role = actor.getRoles().iterator().next();
+		assumeTrue(thatSupportForNestedPropertiesIsAvailable());
 
-		assertThat(role.getRole(), is("Harry Potter"));
+		Movie theParentTrap = new Movie("The Parent Trap");
+		Movie iKnowWhoKilledMe = new Movie("I Know Who Killed Me");
+
+		Actor lindsayLohan = new Actor("Lindsay Lohan");
+
+		lindsayLohan.actedIn(theParentTrap, "Hallie Parker");
+		lindsayLohan.actedIn(theParentTrap, "Annie James");
+		lindsayLohan.actedIn(iKnowWhoKilledMe, "Aubrey Fleming");
+		lindsayLohan.actedIn(iKnowWhoKilledMe, "Dakota Moss");
+		actorRepository.save(lindsayLohan);
+
+		Actor nealMcDonough = new Actor("Neal McDonough");
+		nealMcDonough.actedIn(iKnowWhoKilledMe, "Daniel Fleming");
+		actorRepository.save(nealMcDonough);
+
+		assertThat(actorRepository.findAllByRolesMovieTitle(iKnowWhoKilledMe.getTitle())).hasSize(2)
+				.extracting(Actor::getName).contains(lindsayLohan.getName(), nealMcDonough.getName());
+	}
+
+	private static boolean thatSupportForNestedPropertiesIsAvailable() {
+
+		Version minVersion = Version.parse("2.0.5");
+
+		return Optional.ofNullable(SpringBootVersion.getVersion()).map(Version::parse) //
+				.map(v -> v.isGreaterThanOrEqualTo(minVersion)) //
+				.orElseGet(ActorRepositoryIntegrationTest::fallBackToVersionSpecificClasses);
+	}
+
+	private static boolean fallBackToVersionSpecificClasses() {
+
+		ClassLoader usedClassLoader = ActorRepositoryIntegrationTest.class.getClassLoader();
+
+		String fqnBoot210Class = "org.springframework.boot.autoconfigure.insight.InsightsProperties";
+		String fqnBoot205Class = "org.springframework.boot.autoconfigure.security.servlet.RequestMatcherProvider";
+
+		return ClassUtils.isPresent(fqnBoot210Class, usedClassLoader) //
+				|| ClassUtils.isPresent(fqnBoot205Class, usedClassLoader);
 	}
 }

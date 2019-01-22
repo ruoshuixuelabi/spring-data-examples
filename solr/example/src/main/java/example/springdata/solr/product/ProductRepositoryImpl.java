@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import org.springframework.data.solr.core.query.result.Cursor;
 
 /**
  * Implementation of {@link ProductRepositoryCustom}.
- * 
+ *
  * @author Christoph Strobl
  * @author Oliver Gierke
  */
@@ -39,6 +39,6 @@ class ProductRepositoryImpl implements ProductRepositoryCustom {
 	public Cursor<Product> findAllUsingCursor() {
 
 		// NOTE: Using Cursor requires to sort by an unique field
-		return solrTemplate.queryForCursor(new SimpleQuery("*:*").addSort(new Sort("id")), Product.class);
+		return solrTemplate.queryForCursor("techproducts", new SimpleQuery("*:*").addSort(Sort.by("id")), Product.class);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2016 the original author or authors.
+ * Copyright 2014-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import static org.junit.Assert.*;
 
 import example.springdata.rest.stores.Store.Address;
 
+import java.util.UUID;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,8 +37,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * Integration tests for {@link StoreRepository}.
- * 
+ *
  * @author Oliver Gierke
+ * @author Mark Paluch
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
@@ -54,7 +57,7 @@ public class StoreRepositoryIntegrationTests {
 	public void findsStoresByLocation() {
 
 		Point location = new Point(-73.995146, 40.740337);
-		Store store = new Store("Foo", new Address("street", "city", "zip", location));
+		Store store = new Store(UUID.randomUUID(), "Foo", new Address("street", "city", "zip", location));
 
 		store = repository.save(store);
 

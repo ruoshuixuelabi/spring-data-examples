@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 the original author or authors.
+ * Copyright 2016-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,9 @@
  */
 package example.springdata.mongodb.people;
 
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
-import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
-import org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.mongodb.config.AbstractReactiveMongoConfiguration;
 import org.springframework.data.mongodb.core.mapping.event.LoggingEventListener;
-import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
-
-import com.mongodb.reactivestreams.client.MongoClient;
-import com.mongodb.reactivestreams.client.MongoClients;
 
 /**
  * Simple configuration that registers a {@link LoggingEventListener} to demonstrate mapping behavior when streaming
@@ -34,24 +25,11 @@ import com.mongodb.reactivestreams.client.MongoClients;
  *
  * @author Mark Paluch
  */
-@SpringBootApplication(exclude = { MongoAutoConfiguration.class, MongoDataAutoConfiguration.class })
-@EnableReactiveMongoRepositories
-@AutoConfigureAfter(EmbeddedMongoAutoConfiguration.class)
-class ApplicationConfiguration extends AbstractReactiveMongoConfiguration {
+@SpringBootApplication
+class ApplicationConfiguration {
 
 	@Bean
 	public LoggingEventListener mongoEventListener() {
 		return new LoggingEventListener();
-	}
-
-	@Override
-	@Bean
-	public MongoClient mongoClient() {
-		return MongoClients.create();
-	}
-
-	@Override
-	protected String getDatabaseName() {
-		return "reactive";
 	}
 }

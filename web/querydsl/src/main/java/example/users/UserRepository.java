@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 the original author or authors.
+ * Copyright 2015-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package example.users;
 
-import org.springframework.data.querydsl.QueryDslPredicateExecutor;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.data.repository.CrudRepository;
@@ -26,12 +26,12 @@ import com.querydsl.core.types.dsl.StringPath;
  * Repository to manage {@link User}s. Also implements {@link QueryDslPredicateExecutor} to enable predicate filtering
  * on Spring MVC controllers as well as {@link QuerydslBinderCustomizer} to tweak the way predicates are created for
  * properties.
- * 
+ *
  * @author Christoph Strobl
  * @author Oliver Gierke
  */
 public interface UserRepository
-		extends CrudRepository<User, String>, QueryDslPredicateExecutor<User>, QuerydslBinderCustomizer<QUser> {
+		extends CrudRepository<User, String>, QuerydslPredicateExecutor<User>, QuerydslBinderCustomizer<QUser> {
 
 	/*
 	 * (non-Javadoc)

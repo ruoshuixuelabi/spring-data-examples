@@ -8,7 +8,7 @@
 	<parent>
 		<groupId>org.springframework.data.examples</groupId>
 		<artifactId>spring-data-examples</artifactId>
-		<version>1.0.0.BUILD-SNAPSHOT</version>
+		<version>2.0.0.BUILD-SNAPSHOT</version>
 	</parent>
 
 	<name>Spring Data JPA - Examples</name>
@@ -21,34 +21,29 @@
 		<module>showcase</module>
 		<module>interceptors</module>
 		<module>java8</module>
-		<module>javaslang</module>
 		<module>jpa21</module>
 		<module>security</module>
 		<module>multiple-datasources</module>
 		<module>eclipselink</module>
 		<module>query-by-example</module>
+		<module>vavr</module>
+		<module>deferred</module>
 	</modules>
 
-	<properties>
-		<hibernate.version>5.2.5.Final</hibernate.version>
-	</properties>
+	<profiles>
+		<profile>
+			<id>hibernate-53</id>
+			<properties>
+				<hibernate.version>5.3.0.Final</hibernate.version>
+			</properties>
+		</profile>
+	</profiles>
 
 	<dependencies>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>org.hibernate</groupId>
-					<artifactId>hibernate-entitymanager</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-core</artifactId>
 		</dependency>
 
 		<dependency>

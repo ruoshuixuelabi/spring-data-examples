@@ -13,7 +13,7 @@ together with blocking Spring Data MongoDB data access will open multiple connec
 The main reactive Template API class is `ReactiveMongoTemplate`, ideally used through its interface `ReactiveMongoOperations`. It defines a basic set of reactive data access operations using [Project Reactor](http://projectreactor.io) `Mono` and `Flux` reactive types.
 
 ```java
-template.insertAll(Flux.just(new Person("Walter", "White", 50),
+template.insertAll(Arrays.asList(new Person("Walter", "White", 50),
 				new Person("Skyler", "White", 45),
 				new Person("Saul", "Goodman", 42),
 				new Person("Jesse", "Pinkman", 27)));
@@ -27,7 +27,7 @@ Reactive data access reads and converts individual elements while processing the
 
 ## Reactive Repository support
 
-Spring Data MongoDB provides reactive repository support with Project Reactor and RxJava 1 reactive types. The reactive API supports reactive type conversion between reactive types.
+Spring Data MongoDB provides reactive repository support with Project Reactor and RxJava 2 reactive types. The reactive API supports reactive type conversion between reactive types.
 
 ```java
 public interface ReactivePersonRepository extends ReactiveCrudRepository<Person, String> {
@@ -42,25 +42,25 @@ public interface ReactivePersonRepository extends ReactiveCrudRepository<Person,
 
 	Mono<Person> findByFirstnameAndLastname(Mono<String> firstname, String lastname);
 
-	@InfiniteStream // Use a tailable cursor
+	@Tailable // Use a tailable cursor
 	Flux<Person> findWithTailableCursorBy();
 }
 ```
 
 ```java
-public interface RxJava1PersonRepository extends RxJava1CrudRepository<Person, String> {
+public interface RxJava2PersonRepository extends RxJava2CrudRepository<Person, String> {
 
-	Observable<Person> findByLastname(String lastname);
+	Flowable<Person> findByLastname(String lastname);
 
 	@Query("{ 'firstname': ?0, 'lastname': ?1}")
-	Single<Person> findByFirstnameAndLastname(String firstname, String lastname);
+	Maybe<Person> findByFirstnameAndLastname(String firstname, String lastname);
 
 	// Accept parameter inside a reactive type for deferred execution
-	Observable<Person> findByLastname(Single<String> lastname);
+	Flowable<Person> findByLastname(Single<String> lastname);
 
-	Single<Person> findByFirstnameAndLastname(Single<String> firstname, String lastname);
+	Maybe<Person> findByFirstnameAndLastname(Single<String> firstname, String lastname);
 
-	@InfiniteStream // Use a tailable cursor
-	Observable<Person> findWithTailableCursorBy();
+	@Tailable // Use a tailable cursor
+	Flowable<Person> findWithTailableCursorBy();
 }
 ```

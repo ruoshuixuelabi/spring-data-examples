@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 the original author or authors.
+ * Copyright 2016-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,15 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.geo.Circle;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.QueryByExampleExecutor;
 
 /**
  * @author Christoph Strobl
+ * @author Mark Paluch
  */
-interface PersonRepository extends CrudRepository<Person, String> {
+interface PersonRepository extends CrudRepository<Person, String>, QueryByExampleExecutor<Person> {
 
 	List<Person> findByLastname(String lastname);
 
@@ -35,4 +38,6 @@ interface PersonRepository extends CrudRepository<Person, String> {
 	List<Person> findByFirstnameOrLastname(String firstname, String lastname);
 
 	List<Person> findByAddress_City(String city);
+
+	List<Person> findByAddress_LocationWithin(Circle circle);
 }

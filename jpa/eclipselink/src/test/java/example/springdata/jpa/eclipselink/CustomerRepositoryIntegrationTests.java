@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 the original author or authors.
+ * Copyright 2015-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,7 @@
  */
 package example.springdata.jpa.eclipselink;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.*;
 
 import javax.transaction.Transactional;
 
@@ -28,7 +27,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * Integration test for {@link CustomerRepository}.
- * 
+ *
  * @author Oliver Gierke
  */
 @RunWith(SpringRunner.class)
@@ -43,6 +42,6 @@ public class CustomerRepositoryIntegrationTests {
 
 		Customer dave = customers.save(new Customer("Dave", "Matthews"));
 
-		assertThat(customers.findOne(dave.getId()), is(dave));
+		assertThat(customers.findById(dave.getId())).hasValue(dave);
 	}
 }

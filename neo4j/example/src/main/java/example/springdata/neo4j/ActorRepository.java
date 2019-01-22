@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 the original author or authors.
+ * Copyright 2015-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,24 @@
  */
 package example.springdata.neo4j;
 
-import org.springframework.data.neo4j.repository.GraphRepository;
+import java.util.List;
+
+import org.springframework.data.neo4j.repository.Neo4jRepository;
 
 /**
- * {@link GraphRepository} for {@link Actor}s.
- * 
+ * {@link Neo4jRepository} for {@link Actor actors}.
+ *
  * @author Luanne Misquitta
+ * @author Michael J. Simons
  */
-public interface ActorRepository extends GraphRepository<Actor> {}
+public interface ActorRepository extends Neo4jRepository<Actor, Long> {
+
+	/**
+	 * Nested property from select from roles -> movie -> title, where this here represents the start node in a
+	 * relationship and movie the end node.
+	 * 
+	 * @param title
+	 * @return
+	 */
+	List<Actor> findAllByRolesMovieTitle(String title);
+}

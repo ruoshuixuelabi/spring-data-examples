@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 the original author or authors.
+ * Copyright 2015-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package example.springdata.mongodb.geojson;
 
+import org.bson.Document;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +30,9 @@ import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-
 /**
  * Integration tests for {@link StoreRepository}.
- * 
+ *
  * @author Christoph Strobl
  * @author Oliver Gierke
  */
@@ -50,18 +48,18 @@ public class StoreRepositoryTests {
 
 	/**
 	 * Get all the Starbucks stores within the triangle defined by
-	 * 
+	 *
 	 * <pre>
 	 * <ol>
 	 * <li>43rd & Ninth</li><li>60th & First</li><li>Fresh Meadows</li>
 	 * <ol>
 	 * </pre>
-	 * 
+	 *
 	 * Using {@code $geoWithin} and {@code $geometry} operators.
-	 * 
+	 *
 	 * <pre>
 	 * <code>
-	 * { 
+	 * {
 	 *   "location": {
 	 *     "$geoWithin": {
 	 *       "geometry": {
@@ -79,7 +77,7 @@ public class StoreRepositoryTests {
 	 *   }
 	 * }
 	 * </code>
-	 * 
+	 *
 	 * <pre>
 	 */
 	@Test
@@ -89,18 +87,18 @@ public class StoreRepositoryTests {
 
 	/**
 	 * The legacy format alternative to {@link #findWithinGeoJsonPolygon()}.
-	 * 
+	 *
 	 * <pre>
 	 * <code>
-	 * { 
-	 *   "location" : { 
+	 * {
+	 *   "location" : {
 	 *     "$geoWithin" : {
 	 *        "$polygon" : [ [ -73.992514, 40.758934 ] , [ -73.961138, 40.760348 ] , [ -73.991658, 40.730006 ] ]
 	 *     }
 	 *   }
 	 * }
 	 * </code>
-	 * 
+	 *
 	 * <pre>
 	 */
 	@Test
@@ -116,12 +114,12 @@ public class StoreRepositoryTests {
 	@Test
 	public void findStoresThatIntersectGivenPolygon() {
 
-		DBObject geoJsonDbo = new BasicDBObject();
+		Document geoJsonDbo = new Document();
 
 		operations.getConverter().write(GEO_JSON_POLYGON, geoJsonDbo);
 
 		BasicQuery bq = new BasicQuery(
-				new BasicDBObject("location", new BasicDBObject("$geoIntersects", new BasicDBObject("$geometry", geoJsonDbo))));
+				new Document("location", new Document("$geoIntersects", new Document("$geometry", geoJsonDbo))));
 
 		operations.find(bq, Store.class).forEach(System.out::println);
 	}
