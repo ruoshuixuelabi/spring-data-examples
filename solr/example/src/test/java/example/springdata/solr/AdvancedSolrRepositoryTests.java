@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,6 +27,8 @@ import example.springdata.solr.test.util.RequiresSolrServer;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Optional;
+
+import javax.annotation.PostConstruct;
 
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -50,15 +52,15 @@ import org.springframework.test.context.junit4.SpringRunner;
  * @author Mark Paluch
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = SolrTestConfiguration.class)
 public class AdvancedSolrRepositoryTests {
 
-	public static @ClassRule RequiresSolrServer requiresRunningServer = RequiresSolrServer.onLocalhost();
+	public static @ClassRule RequiresSolrServer requiresRunningServer = RequiresSolrServer.onLocalhost().withCollection("techproducts");
 
 	@Configuration
-	static class Config extends SolrTestConfiguration {
+	static class Config {
 
-		@Override
+		@PostConstruct
 		protected void doInitTestData(CrudRepository<Product, String> repository) {
 
 			Product playstation = Product.builder().id("id-1").name("Playstation")
@@ -82,7 +84,7 @@ public class AdvancedSolrRepositoryTests {
 	@Test
 	public void annotationBasedHighlighting() {
 
-		HighlightPage<Product> products = repository.findByDescriptionStartingWith("play", new PageRequest(0, 10));
+		HighlightPage<Product> products = repository.findByDescriptionStartingWith("play", PageRequest.of(0, 10));
 
 		products.getHighlighted().forEach(entry -> entry.getHighlights().forEach(highligh -> System.out
 				.println(entry.getEntity().getId() + " | " + highligh.getField() + ":\t" + highligh.getSnipplets())));

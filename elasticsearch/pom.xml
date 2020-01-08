@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>spring-data-elasticsearch-examples</artifactId>
@@ -17,6 +17,8 @@
 
 	<modules>
 		<module>example</module>
+		<module>rest</module>
+		<module>reactive</module>
 	</modules>
 
 	<dependencies>
@@ -25,5 +27,20 @@
 			<artifactId>spring-boot-starter-data-elasticsearch</artifactId>
 		</dependency>
 	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>spring-data-next-releasetrain</id>
+			<properties>
+				<elasticsearch.version>6.8.2</elasticsearch.version>
+			</properties>
+		</profile>
+		<profile>
+			<id>spring-data-next-releasetrain-released</id>
+			<properties>
+				<elasticsearch.version>6.8.2</elasticsearch.version>
+			</properties>
+		</profile>
+	</profiles>
 
 </project>

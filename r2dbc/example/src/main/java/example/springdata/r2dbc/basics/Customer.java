@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,7 +17,6 @@ package example.springdata.r2dbc.basics;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Value;
 
 import org.springframework.data.annotation.Id;
 
@@ -27,6 +26,11 @@ import org.springframework.data.annotation.Id;
 @Data
 @AllArgsConstructor
 class Customer {
+
 	@Id Integer id;
 	String firstname, lastname;
+
+	boolean hasId() {
+		return id != null;
+	}
 }

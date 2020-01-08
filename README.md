@@ -27,12 +27,13 @@ We have separate folders for the samples of individual modules:
 * `geo-json` - Example project showing usage of [GeoJSON](http://geojson.org) with MongoDB.
 * `gridfs` - Example project showing usage of gridFS with MongoDB.
 * `java8` - Example of how to use Spring Data MongoDB with Java 8 date time types as well as the usage of `Optional` as return type for repository methods. Note, this project requires to be build with JDK 8.
-* `kotlin` - Example for using Cassandra with MongoDB.
+* `kotlin` - Example for using [Kotlin](https://kotlinlang.org/) with MongoDB.
 * `query-by-example` - Example project showing usage of Query by Example with MongoDB.
+* `querydsl` - Example project showing imperative and reactive [Querydsl](https://github.com/querydsl/querydsl) support for MongoDB.
 * `reactive` - Example project to show reactive template and repository support.
 * `security` - Example project showing usage of Spring Security with MongoDB.
 * `text-search` - Example project showing usage of MongoDB text search feature.
-* `transactions` - Example project for synchronous and reactive MongoDB 4.0 transaction support.
+* `transactions` - Example project for imperative and reactive MongoDB 4.0 transaction support.
 
 ## Spring Data REST
 
@@ -50,6 +51,7 @@ We have separate folders for the samples of individual modules:
 * `reactive` - Example project to show reactive template support.
 * `repositories` - Example demonstrating Spring Data repository abstraction on top of Redis.
 * `sentinel` - Example for Redis Sentinel support.
+* `streams` - Example for [Redis Streams](https://redis.io/topics/streams-intro) support.
 
 ## Spring Data for Apache Solr
 
@@ -59,6 +61,8 @@ We have separate folders for the samples of individual modules:
 ## Spring Data Elasticsearch
 
 * `example` - Example how to use basic text search, geo-spatial search and facets.
+* `rest` - Example how to use the High Level REST Client backing template and repository.
+* `reactive` - Example how to use reactive client, template and repository features.
 
 ## Spring Data Neo4j
 

@@ -2,25 +2,27 @@ language: java
 
 matrix:
   include:
-    - jdk: oraclejdk8
-      env: JDK='Oracle JDK 8'
-    - jdk: oraclejdk9
-      env: JDK='Oracle JDK 9'
-    - env: JDK='Oracle JDK 10'
-      before_install: wget https://github.com/sormuras/bach/raw/master/install-jdk.sh && . ./install-jdk.sh -F 10
-    - env: JDK='Oracle JDK 11'
-      before_install: wget https://github.com/sormuras/bach/raw/master/install-jdk.sh && . ./install-jdk.sh -F 11
+    - jdk: openjdk8
+      env: JDK='OpenJDK 8'
+    - env: JDK='OpenJDK 11'
+      before_install: wget https://github.com/sormuras/bach/raw/master/install-jdk.sh && . ./install-jdk.sh -f 11
+    - env: JDK='OpenJDK 12'
+      before_install: wget https://github.com/sormuras/bach/raw/master/install-jdk.sh && . ./install-jdk.sh -f 12
+    - env: JDK='OpenJDK 13'
+      before_install: wget https://github.com/sormuras/bach/raw/master/install-jdk.sh && . ./install-jdk.sh -f 13
+    - env: JDK='OpenJDK EA'
+      before_install: wget https://github.com/sormuras/bach/raw/master/install-jdk.sh && . ./install-jdk.sh
 
 addons:
   apt:
     sources:
-      - sourceline: 'deb http://packages.couchbase.com/releases/couchbase-server/community/deb/  trusty trusty/main'
-      - sourceline: 'deb http://packages.couchbase.com/ubuntu trusty trusty/main'
+      - sourceline: 'deb http://packages.couchbase.com/releases/couchbase-server/community/deb/  xenial xenial/main'
         key_url: 'http://packages.couchbase.com/ubuntu/couchbase.key'
     packages:
       - couchbase-server-community
 
 services:
+  - couchbase-server
   - redis-server
   - docker
 
@@ -38,7 +40,7 @@ install:
   - /opt/couchbase/bin/cbdocloader -c 127.0.0.1:8091 -u Administrator -p password -b travel-sample -m 256 -d /opt/couchbase/samples/travel-sample.zip
   - /opt/couchbase/bin/couchbase-cli user-manage -c 127.0.0.1:8091 -u Administrator -p password --set  --rbac-username=travel-sample --rbac-password=password --roles=admin --auth-domain local
 
-
 script:
   - mvn -version
-  - mvn clean dependency:list test -U -Dsort -Dmaven.test.redirectTestOutputToFile=true -B
+  - java -version
+  - mvn clean dependency:list test -U -Dsort -Dmaven.test.redirectTestOutputToFile=true -B -s settings.xml

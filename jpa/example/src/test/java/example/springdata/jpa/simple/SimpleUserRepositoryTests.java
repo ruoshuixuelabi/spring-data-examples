@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -171,12 +171,12 @@ public class SimpleUserRepositoryTests {
 		// we deliberately save the items in reverse
 		repository.saveAll(Arrays.asList(user2, user1, user0));
 
-		List<User> resultAsc = repository.findTop2By(new Sort(ASC, "lastname"));
+		List<User> resultAsc = repository.findTop2By(Sort.by(ASC, "lastname"));
 
 		assertThat(resultAsc.size(), is(2));
 		assertThat(resultAsc, hasItems(user0, user1));
 
-		List<User> resultDesc = repository.findTop2By(new Sort(DESC, "lastname"));
+		List<User> resultDesc = repository.findTop2By(Sort.by(DESC, "lastname"));
 
 		assertThat(resultDesc.size(), is(2));
 		assertThat(resultDesc, hasItems(user1, user2));

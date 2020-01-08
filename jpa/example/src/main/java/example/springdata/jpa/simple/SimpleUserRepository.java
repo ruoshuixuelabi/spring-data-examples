@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -38,7 +38,7 @@ public interface SimpleUserRepository extends CrudRepository<User, Long> {
 	 * Find the user with the given username. This method will be translated into a query using the
 	 * {@link javax.persistence.NamedQuery} annotation at the {@link User} class.
 	 *
-	 * @param lastname
+	 * @param username
 	 * @return
 	 */
 	User findByTheUsersName(String username);

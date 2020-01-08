@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>spring-data-r2dbc-examples</artifactId>
@@ -21,40 +21,22 @@
 	</modules>
 
 	<properties>
-		<reactor-bom.version>Californium-SR3</reactor-bom.version>
-		<spring-data-releasetrain.version>Moore-M1</spring-data-releasetrain.version>
+		<spring-boot-data-r2dbc.version>0.1.0.BUILD-SNAPSHOT</spring-boot-data-r2dbc.version>
+		<r2dbc-h2.version>0.8.0.RELEASE</r2dbc-h2.version>
 	</properties>
 
 	<dependencies>
 
 		<dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-r2dbc</artifactId>
-			<version>1.0.0.M1</version>
+			<groupId>org.springframework.boot.experimental</groupId>
+			<artifactId>spring-boot-starter-data-r2dbc</artifactId>
+			<version>${spring-boot-data-r2dbc.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>io.r2dbc</groupId>
-			<artifactId>r2dbc-spi</artifactId>
-			<version>1.0.0.M6</version>
-		</dependency>
-
-		<dependency>
-			<groupId>io.r2dbc</groupId>
-			<artifactId>r2dbc-postgresql</artifactId>
-			<version>1.0.0.M6</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.testcontainers</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>1.9.1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>io.projectreactor</groupId>
-			<artifactId>reactor-core</artifactId>
+			<artifactId>r2dbc-h2</artifactId>
+			<version>${r2dbc-h2.version}</version>
 		</dependency>
 
 		<dependency>
@@ -63,24 +45,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>io.projectreactor.addons</groupId>
-			<artifactId>reactor-extra</artifactId>
-		</dependency>
-
 	</dependencies>
-
-	<profiles>
-
-		<!-- Override property as the module always needs Moore -->
-
-		<profile>
-			<id>spring-data-next</id>
-			<properties>
-				<spring-data-releasetrain.version>Moore-BUILD-SNAPSHOT</spring-data-releasetrain.version>
-			</properties>
-		</profile>
-
-	</profiles>
 
 </project>

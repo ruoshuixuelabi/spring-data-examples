@@ -1,11 +1,11 @@
 /*
- * Copyright 2014-2018 the original author or authors.
+ * Copyright 2014-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,9 +15,8 @@
  */
 package example.springdata.mongodb.aggregation;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.number.IsCloseTo.*;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.data.Offset.offset;
 
 import java.util.Date;
 
@@ -26,6 +25,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
@@ -33,6 +33,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  *
  * @author Thomas Darimont
  * @author Oliver Gierke
+ * @author Christoph Strobl
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -58,10 +59,39 @@ public class OrderRepositoryIntegrationTests {
 
 		Invoice invoice = repository.getInvoiceFor(order);
 
-		assertThat(invoice, is(notNullValue()));
-		assertThat(invoice.getOrderId(), is(order.getId()));
-		assertThat(invoice.getNetAmount(), is(closeTo(8.3, 000001)));
-		assertThat(invoice.getTaxAmount(), is(closeTo(1.577, 000001)));
-		assertThat(invoice.getTotalAmount(), is(closeTo(9.877, 000001)));
+		assertThat(invoice).isNotNull();
+		assertThat(invoice.getOrderId()).isEqualTo(order.getId());
+		assertThat(invoice.getNetAmount()).isCloseTo(8.3D, offset(0.00001));
+		assertThat(invoice.getTaxAmount()).isCloseTo(1.577D, offset(0.00001));
+		assertThat(invoice.getTotalAmount()).isCloseTo(9.877, offset(0.00001));
+	}
+
+	@Test
+	public void declarativeAggregationWithSort() {
+
+		repository.save(new Order("c42", new Date()).addItem(product1));
+		repository.save(new Order("c42", new Date()).addItem(product2));
+		repository.save(new Order("c42", new Date()).addItem(product3));
+
+		repository.save(new Order("b12", new Date()).addItem(product1));
+		repository.save(new Order("b12", new Date()).addItem(product1));
+
+		assertThat(repository.totalOrdersPerCustomer(Sort.by(Sort.Order.desc("total")))) //
+				.containsExactly( //
+						new OrdersPerCustomer("c42", 3L), new OrdersPerCustomer("b12", 2L) //
+				);
+	}
+
+	@Test
+	public void multiStageDeclarativeAggregation() {
+
+		repository.save(new Order("c42", new Date()).addItem(product1));
+		repository.save(new Order("c42", new Date()).addItem(product2));
+		repository.save(new Order("c42", new Date()).addItem(product3));
+
+		repository.save(new Order("b12", new Date()).addItem(product1));
+		repository.save(new Order("b12", new Date()).addItem(product1));
+
+		assertThat(repository.totalOrdersForCustomer("c42")).isEqualTo(3);
 	}
 }
